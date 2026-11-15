@@ -10,12 +10,14 @@
 <meta name="theme-color" content="#111111">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preload" href="fonts/anton.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="img/splash.png" as="image">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <title>YJGB</title>
 <style>
+@font-face{font-family:"Jost";src:url("fonts/jost-800-italic.woff2") format("woff2");font-weight:800;font-style:italic;font-display:swap}
 @font-face{font-family:"Anton";src:url("fonts/anton.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
-:root{--bg:#efebe2;--card:#fbf9f4;--card2:#e2ddd1;--ink:#111;--line:#cfc8ba;--tx:#111;--mut:#5f5a51;--acc:#d7261e;--ok:#1f7a4a;--disp:"Anton",Impact,"Arial Narrow Bold",sans-serif;color-scheme:light}
+:root{--bg:#efebe2;--card:#fbf9f4;--card2:#e2ddd1;--ink:#111;--line:#cfc8ba;--tx:#111;--mut:#5f5a51;--acc:#e33425;--ok:#1f7a4a;--disp:"Anton",Impact,"Arial Narrow Bold",sans-serif;color-scheme:light}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-text-size-adjust:100%}
 body{padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);min-height:100vh}
@@ -24,7 +26,12 @@ body.locked{overflow:hidden}
 main{padding:8px 16px calc(104px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto}
 button,input,select,textarea{font-family:inherit;font-size:16px;color:inherit}
 .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:16px 2px 12px;margin-bottom:16px;border-bottom:4px solid var(--ink)}
-h1.logo{line-height:0}h1.logo img{height:68px;width:auto;display:block}
+h1.brand{font-family:Futura,"Futura PT","Jost",sans-serif;font-weight:800;font-style:italic;color:var(--acc);font-size:54px;line-height:.85;letter-spacing:-.01em;text-transform:uppercase}
+#splash{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .35s ease}
+#splash img{width:min(60vw,300px);height:auto;animation:splashPulse 1.6s ease-in-out infinite}
+#splash.out{opacity:0;pointer-events:none}
+@keyframes splashPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+@media (prefers-reduced-motion:reduce){#splash img{animation:none}}
 h1{font-family:var(--disp);font-weight:400;font-size:52px;line-height:.9;margin:0;text-transform:uppercase;letter-spacing:.01em}
 h2{font-family:var(--disp);font-weight:400;margin:0 0 8px;font-size:28px;line-height:1.05;text-transform:uppercase;letter-spacing:.01em}
 .date{color:var(--mut);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;text-align:right}
@@ -130,6 +137,7 @@ input:focus,select:focus,textarea:focus{outline:3px solid var(--acc);outline-off
 </style>
 </head>
 <body>
+<div id="splash" aria-hidden="true"><img src="img/splash.png" alt=""></div>
 <main id="main"></main>
 <nav class="tabbar">
   <button data-tab="now"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Now</button>
@@ -144,7 +152,7 @@ input:focus,select:focus,textarea:focus{outline:3px solid var(--acc);outline-off
 (() => {
 'use strict';
 const KEY = 'doit.v1';
-const APP_VERSION = '0.3.1';
+const APP_VERSION = '0.4.0';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
@@ -269,7 +277,7 @@ function backupNudge() {
 
 function viewNow() {
   const bell = S.notif.enabled || S.notifications.length ? `<button class="bell" data-act="inbox" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="badge">${unreadCount() || ''}</span></button>` : '';
-  let h = `<header class="top"><h1 class="logo"><img src="img/logo.png" alt="YJGB" width="45" height="68"></h1><div class="hdr-r"><div class="date">${fmtDate(new Date())}</div>${bell}</div></header>`;
+  let h = `<header class="top"><h1 class="brand">YJGB</h1><div class="hdr-r"><div class="date">${fmtDate(new Date())}</div>${bell}</div></header>`;
   if (S.timer) {
     const g = G(S.timer.goalId);
     if (g) {
@@ -810,6 +818,12 @@ if ('serviceWorker' in navigator) {
 plan();
 render();
 if (location.hash.startsWith('#n-')) { const a = location.hash.slice(3); history.replaceState(null, '', location.pathname); runAction({ action: a }); }
+// Splash: shown on every cold launch, minimum 1s from navigation start, then fades out.
+(() => {
+  const sp = $('#splash'); if (!sp) return;
+  const wait = Math.max(0, 1000 - performance.now());
+  setTimeout(() => { sp.classList.add('out'); setTimeout(() => sp.remove(), 400); }, wait);
+})();
 deliverDue();
 setInterval(deliverDue, 10000);
 setInterval(plan, 5 * 60000);
