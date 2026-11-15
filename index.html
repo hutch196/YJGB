@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="YJGB">
+<meta name="theme-color" content="#0e0e10">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<title>YJGB</title>
+<style>
+:root{--bg:#0e0e10;--card:#18181c;--card2:#24242a;--line:#2e2e36;--tx:#f4f4f5;--mut:#9a9aa3;--acc:#ff4d2e;--ok:#3ecf8e;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-text-size-adjust:100%}
+body{padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);min-height:100vh}
+body.locked{overflow:hidden}
+main{padding:8px 16px calc(100px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto}
+button,input,select,textarea{font-family:inherit;font-size:16px;color:inherit}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 2px 16px}
+h1{font-size:34px;font-weight:900;letter-spacing:-.03em;margin:0;line-height:1}
+h1 b{color:var(--acc)}
+h2{margin:0 0 6px;font-size:24px;line-height:1.15;letter-spacing:-.01em}
+.date{color:var(--mut);font-size:14px;font-weight:600}
+.card{background:var(--card);border-radius:22px;padding:20px;margin-bottom:14px}
+.crumb{color:var(--mut);font-size:13px;font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+.lab{color:var(--acc);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin:14px 0 4px}
+.focus{font-size:19px;line-height:1.35;margin:0;white-space:pre-wrap}
+.focus.missing{color:var(--mut);font-size:16px}
+.ctx{color:var(--mut);font-size:15px;margin:6px 0 0;white-space:pre-wrap}
+.prog{margin-top:16px;font-size:14px;color:var(--mut);font-weight:600}
+.bar{height:8px;background:var(--card2);border-radius:8px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:8px;width:0;transition:width .4s}
+.bar.ok i{background:var(--ok)}
+.row{display:flex;gap:10px;margin-top:18px}
+.row.wrap{flex-wrap:wrap}
+.row>.btn{flex:1}
+.row.wrap>.btn{flex:1 1 40%}
+.btn{min-height:50px;border-radius:14px;border:0;font-weight:700;padding:0 16px;cursor:pointer}
+.btn:active{transform:scale(.98);opacity:.9}
+.primary{background:var(--acc);color:#fff}
+.big{width:100%;min-height:66px;font-size:21px;font-weight:900;letter-spacing:.01em}
+.ghost{background:var(--card2);color:var(--tx)}
+.danger{background:#3a1512;color:#ff8a7a}
+.small{min-height:44px;font-size:15px;padding:0 14px}
+.btn:disabled{opacity:.35}
+.clock{font-size:76px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.03em;text-align:center;margin:18px 0 4px;line-height:1}
+.sub{text-align:center;color:var(--mut);font-weight:600;margin-top:8px}
+.next h3{font-size:13px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;margin:22px 4px 8px}
+.nrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:0;border-radius:14px;padding:12px 14px;margin-bottom:8px;min-height:56px;color:var(--tx)}
+.nrow .t{flex:1;font-weight:600}
+.nrow .m{color:var(--mut);font-size:13px}
+.banner{display:block;width:100%;text-align:left;background:#2a1d10;color:#ffb37a;border:0;border-radius:14px;padding:12px 14px;font-weight:600;font-size:14px;min-height:48px;margin-bottom:14px}
+.empty p{color:var(--mut)}
+.hint{color:var(--mut);font-size:14px;background:var(--card);border-radius:14px;padding:14px;margin:0 0 14px}
+.node{display:flex;align-items:stretch;padding-left:calc(var(--d) * 18px)}
+.chev,.chev-sp{width:36px;flex:none}
+.chev{background:none;border:0;color:var(--mut);font-size:22px;transition:transform .15s;min-height:52px}
+.chev.open{transform:rotate(90deg)}
+.nodebody{flex:1;min-width:0;text-align:left;background:var(--card);border:0;border-radius:14px;padding:10px 14px;margin:3px 0;color:var(--tx);min-height:52px;display:flex;flex-direction:column;justify-content:center;gap:3px}
+.node.d0 .nodebody{background:var(--card2)}
+.node.d0 .t{font-weight:800}
+.nodebody .t{font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.nodebody .meta{display:flex;align-items:center;gap:8px;color:var(--mut);font-size:12px;font-weight:600}
+.node.paused .nodebody,.node.done .nodebody,.node.inh .nodebody{opacity:.45}
+.node.done .t{text-decoration:line-through}
+.pill{background:var(--acc);color:#fff;border-radius:6px;padding:1px 6px;font-size:11px;font-weight:800}
+.dots{display:inline-flex;gap:3px}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--acc)}
+.tabbar{position:fixed;left:0;right:0;bottom:0;display:flex;background:rgba(14,14,16,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:4px max(8px,env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));z-index:10}
+.tabbar button{flex:1;min-height:54px;background:none;border:0;color:var(--mut);font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.tabbar button.on{color:var(--acc)}
+.tabbar svg{width:24px;height:24px}
+.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20;opacity:0;pointer-events:none;transition:opacity .2s}
+.backdrop.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;background:#141418;border-radius:22px 22px 0 0;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:18px max(16px,env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));transform:translateY(105%);transition:transform .25s ease;max-width:640px;margin:0 auto}
+.sheet.on{transform:none}
+.sheet h2{margin-bottom:12px}
+label,.lbl{display:block;font-size:13px;font-weight:700;color:var(--mut);margin:14px 0 6px}
+label input,label select,label textarea{display:block;width:100%;margin-top:6px}
+input,select,textarea{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;min-height:48px;color:var(--tx);-webkit-appearance:none;appearance:none}
+textarea{resize:vertical;line-height:1.35}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:-1px}
+.two{display:flex;gap:10px}.two>*{flex:1}
+.seg{display:flex;background:var(--card2);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;min-height:44px;border:0;border-radius:10px;background:none;color:var(--mut);font-weight:700;text-transform:capitalize}
+.seg button.on{background:var(--acc);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chips button{min-height:44px;padding:0 16px;border-radius:22px;border:0;background:var(--card2);font-weight:600}
+.stat{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+.stat:last-child{border:0}.stat span:last-child{color:var(--mut);font-weight:600}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:#fff;color:#000;font-weight:700;font-size:14px;padding:10px 16px;border-radius:12px;opacity:0;transition:.2s;z-index:30;pointer-events:none;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.file{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.file input{position:absolute;inset:0;opacity:0;min-height:0}
+.hdr-r{display:flex;align-items:center;gap:10px}
+.bell{position:relative;width:44px;height:44px;border-radius:12px;background:var(--card);border:0;color:var(--tx);display:flex;align-items:center;justify-content:center;flex:none}
+.bell svg{width:22px;height:22px}
+.badge{position:absolute;top:3px;right:3px;min-width:18px;height:18px;border-radius:9px;background:var(--acc);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.badge:empty{display:none}
+.nbanner{position:fixed;left:8px;right:8px;top:calc(8px + env(safe-area-inset-top));z-index:40;background:rgba(44,44,50,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:18px;padding:12px 14px;display:flex;gap:12px;align-items:center;transform:translateY(-160%);transition:transform .3s;max-width:560px;margin:0 auto;box-shadow:0 10px 30px rgba(0,0,0,.5);border:0;color:var(--tx);text-align:left;min-height:64px}
+.nbanner.on{transform:none}
+.nbanner img{width:38px;height:38px;border-radius:9px;flex:none}
+.nt{display:block;font-weight:700;font-size:15px}.nb{display:block;font-size:14px;color:#cfcfd4}
+.nbanner .na{font-size:11px;color:var(--mut);align-self:flex-start;flex:none}
+.ni{display:block;width:100%;text-align:left;background:var(--card);border:0;border-radius:14px;padding:12px 14px;margin-bottom:8px;color:var(--tx)}
+.ni.unread{box-shadow:inset 3px 0 0 var(--acc)}
+.ni.sched{opacity:.7}
+.nm{display:block;font-size:12px;color:var(--mut);margin-top:4px;font-weight:600}
+.st{font-size:10px;font-weight:800;text-transform:uppercase;padding:1px 6px;border-radius:6px;background:var(--card2);color:var(--mut);letter-spacing:.04em}
+.st.failed{color:#ff8a7a}.st.missed{color:#ffb37a}.st.opened{color:var(--ok)}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px;border-bottom:1px solid var(--line);font-size:15px;font-weight:600}
+.swr{display:flex;align-items:center;gap:8px;color:var(--mut)}
+.swl{display:flex;align-items:center;min-height:44px;margin:0;padding:0}
+.sw input[type=checkbox]{-webkit-appearance:none;appearance:none;width:51px;height:31px;min-height:31px;border-radius:16px;background:var(--line);position:relative;padding:0;border:0;flex:none;display:inline-block;margin:0;transition:background .2s}
+.sw input[type=checkbox]::after{content:'';position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;transition:transform .2s}
+.sw input[type=checkbox]:checked{background:var(--ok)}
+.sw input[type=checkbox]:checked::after{transform:translateX(20px)}
+.sw .tm{width:auto;min-height:40px;padding:6px 8px;display:inline-block;margin:0;font-size:15px}
+</style>
+</head>
+<body>
+<main id="main"></main>
+<nav class="tabbar">
+  <button data-tab="now"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Now</button>
+  <button data-tab="goals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 5h16M8 12h12M12 19h8"/></svg>Goals</button>
+  <button data-tab="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>More</button>
+</nav>
+<div class="backdrop" id="backdrop"></div>
+<div class="sheet" id="sheet"></div>
+<div class="toast" id="toast"></div>
+<button class="nbanner" id="nbanner" data-act="nAction"></button>
+<script>
+(() => {
+'use strict';
+const KEY = 'doit.v1';
+const APP_VERSION = '0.2.1';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
+const now = () => Date.now();
+
+// ---------- storage ----------
+const NOTIF_DEFAULTS = {
+  enabled: false, transport: 'mock', subscription: null, permission: 'default', simulateFailure: false,
+  prefs: { sessionEnd: true, kickoff: true, kickoffTime: '08:00', idle: true, idleTime: '19:00', backup: true },
+  quiet: { start: '22:00', end: '07:00' },
+};
+const clone = o => JSON.parse(JSON.stringify(o));
+function blank() { return { version: 1, goals: [], sessions: [], timer: null, lastExport: null, notif: clone(NOTIF_DEFAULTS), notifications: [] }; }
+function migrate(d) {
+  const b = blank();
+  const out = Object.assign(b, d && typeof d === 'object' ? d : {});
+  if (!Array.isArray(out.goals)) out.goals = [];
+  if (!Array.isArray(out.sessions)) out.sessions = [];
+  if (!Array.isArray(out.notifications)) out.notifications = [];
+  const n = (d && d.notif) || {};
+  out.notif = Object.assign(clone(NOTIF_DEFAULTS), n, {
+    prefs: Object.assign(clone(NOTIF_DEFAULTS.prefs), n.prefs || {}),
+    quiet: Object.assign(clone(NOTIF_DEFAULTS.quiet), n.quiet || {}),
+  });
+  return out;
+}
+function load() {
+  try { const r = localStorage.getItem(KEY); if (r) return migrate(JSON.parse(r)); } catch (e) {}
+  return blank();
+}
+let S = load();
+let saveOk = true;
+function persist() {
+  try { localStorage.setItem(KEY, JSON.stringify(S)); saveOk = true; }
+  catch (e) { saveOk = false; toast('Save failed — export a backup now'); }
+}
+function save() { persist(); if (!planning) { try { plan(); } catch (e) { console.error(e); } } }
+let planning = false;
+let persisted = null;
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist().then(p => { persisted = p; }).catch(() => {}); } catch (e) {}
+
+// ---------- time ----------
+function dayStart(d = new Date()) { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+function weekStart(d = new Date()) { const x = dayStart(d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; } // Monday
+const fmtDate = d => d.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+const isoDate = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+function fmtClock(ms) {
+  const t = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60), s = t % 60;
+  return h ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${m}:${String(s).padStart(2,'0')}`;
+}
+function ago(ts) {
+  if (!ts) return 'never';
+  const d = Math.floor((now() - ts) / 86400000);
+  return d <= 0 ? 'today' : d === 1 ? 'yesterday' : `${d} days ago`;
+}
+
+// ---------- goal model ----------
+const G = id => S.goals.find(g => g.id === id);
+const cmpSib = (a, b) => (b.value - a.value) || (a.order - b.order) || (a.created - b.created);
+const kids = pid => S.goals.filter(g => (g.parentId || null) === (pid || null)).sort(cmpSib);
+function path(g) { // root → g
+  const p = [], seen = new Set();
+  let c = g;
+  while (c && !seen.has(c.id)) { seen.add(c.id); p.unshift(c); c = c.parentId ? G(c.parentId) : null; }
+  return p;
+}
+function subtreeIds(id) { const out = [id]; for (const k of S.goals) if (k.parentId === id) out.push(...subtreeIds(k.id)); return out; }
+// Priority: compare ancestor paths top-down. A child never outranks its parent's higher-value siblings.
+function cmpRank(a, b) {
+  const pa = path(a), pb = path(b);
+  for (let i = 0; i < Math.min(pa.length, pb.length); i++) {
+    if (pa[i].id !== pb[i].id) return cmpSib(pa[i], pb[i]);
+  }
+  return pa.length - pb.length;
+}
+const effActive = g => path(g).every(x => x.status === 'active');
+function weekMin(id) {
+  const ws = +weekStart(), ids = new Set(subtreeIds(id));
+  return S.sessions.reduce((t, s) => t + (s.status === 'done' && ids.has(s.goalId) && s.start >= ws ? (s.end - s.start) / 60000 : 0), 0);
+}
+const targetMet = g => g.weeklyTargetMin > 0 && weekMin(g.id) >= g.weeklyTargetMin;
+function skippedTodayIds() {
+  const t0 = +dayStart();
+  return new Set(S.sessions.filter(s => s.status === 'skipped' && s.start >= t0).map(s => s.goalId));
+}
+// Candidates for the Now screen: active leaves, not skipped today, no target met on self or any ancestor.
+function candidates(fresh = false) { // fresh: ignore today's skips/sessions (used to plan tomorrow)
+  const skipped = fresh ? new Set() : skippedTodayIds(), t0 = +dayStart();
+  const doneToday = fresh ? new Set() : new Set(S.sessions.filter(s => s.status === 'done' && s.start >= t0).map(s => s.goalId));
+  return S.goals.filter(g => {
+    if (!effActive(g)) return false;
+    if (S.goals.some(k => k.parentId === g.id && k.status === 'active')) return false;
+    if (skipped.has(g.id)) return false;
+    if (path(g).some(targetMet)) return false;
+    return true;
+  }).sort((a, b) => (doneToday.has(a.id) - doneToday.has(b.id)) || cmpRank(a, b)); // worked today → drops behind untouched goals
+}
+function nearestTarget(g) { const p = path(g); for (let i = p.length - 1; i >= 0; i--) if (p[i].weeklyTargetMin > 0) return p[i]; return null; }
+const crumb = g => path(g).slice(0, -1).map(x => esc(x.title)).join(' › ');
+const dots = v => `<span class="dots">${[1,2,3,4,5].map(i => `<i class="${i <= v ? 'on' : ''}"></i>`).join('')}</span>`;
+
+// ---------- views ----------
+let tab = 'now';
+function render() {
+  document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  $('#main').innerHTML = tab === 'now' ? viewNow() : tab === 'goals' ? viewGoals() : viewMore();
+  tick();
+}
+
+function progressBlock(g) {
+  const t = nearestTarget(g);
+  if (!t) return '';
+  const m = Math.round(weekMin(t.id)), pct = Math.min(100, m / t.weeklyTargetMin * 100);
+  return `<div class="prog">${t.id === g.id ? '' : esc(t.title) + ': '}${m} / ${t.weeklyTargetMin} min this week
+    <div class="bar ${pct >= 100 ? 'ok' : ''}"><i style="width:${pct}%"></i></div></div>`;
+}
+function backupNudge() {
+  if (!S.goals.length) return '';
+  if (S.lastExport && now() - S.lastExport < 7 * 86400000) return '';
+  return `<button class="banner" data-act="tab" data-tab="more">Last backup: ${ago(S.lastExport)}. Tap to export — iOS can clear web-app data.</button>`;
+}
+
+function viewNow() {
+  const bell = S.notif.enabled || S.notifications.length ? `<button class="bell" data-act="inbox" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="badge">${unreadCount() || ''}</span></button>` : '';
+  let h = `<header class="top"><h1>YJGB</h1><div class="hdr-r"><div class="date">${fmtDate(new Date())}</div>${bell}</div></header>`;
+  if (S.timer) {
+    const g = G(S.timer.goalId);
+    if (g) {
+      return h + `<section class="card">
+        ${crumb(g) ? `<div class="crumb">${crumb(g)}</div>` : ''}
+        <h2>${esc(g.title)}</h2>
+        ${g.focus ? `<p class="focus">${esc(g.focus)}</p>` : ''}
+        <div class="clock" id="clock">0:00</div>
+        <div class="bar"><i id="tbar"></i></div>
+        <div class="sub" id="tsub"></div>
+        <div class="row"><button class="btn primary big" data-act="finish">Done</button></div>
+        <div class="row"><button class="btn ghost" data-act="cancelTimer">Cancel session</button></div>
+      </section>`;
+    }
+    S.timer = null; save();
+  }
+  h += backupNudge();
+  if (!S.goals.length) {
+    return h + `<section class="card empty"><h2>Nothing to do yet.</h2>
+      <p>Add an area (e.g. “Music”), then goals under it. The highest-priority one shows up here as your next action.</p>
+      <button class="btn primary big" data-act="newGoal">Add first goal</button></section>`;
+  }
+  const c = candidates();
+  if (!c.length) {
+    return h + `<section class="card empty"><h2>All clear.</h2>
+      <p>Every active goal has hit its weekly target or was skipped today.</p>
+      ${skippedTodayIds().size ? '<button class="btn ghost" data-act="unskip">Un-skip today</button>' : ''}</section>`;
+  }
+  const g = c[0];
+  h += `<section class="card">
+    ${crumb(g) ? `<div class="crumb">${crumb(g)}</div>` : ''}
+    <h2>${esc(g.title)}</h2>
+    <div class="lab">Next action</div>
+    ${g.focus ? `<p class="focus">${esc(g.focus)}</p>` : `<p class="focus missing">No next action set. <a href="#" data-act="edit" data-id="${g.id}" style="color:var(--acc)">Add one</a> — it's what makes this screen useful.</p>`}
+    ${g.struggles ? `<div class="lab">Watch out for</div><p class="ctx">${esc(g.struggles)}</p>` : ''}
+    ${progressBlock(g)}
+    <div class="row"><button class="btn primary big" data-act="start" data-id="${g.id}">YJGB · ${g.sessionLengthMin || 30} min</button></div>
+    <div class="row"><button class="btn ghost" data-act="skip" data-id="${g.id}">Skip</button><button class="btn ghost" data-act="edit" data-id="${g.id}">Edit</button></div>
+  </section>`;
+  if (c.length > 1) {
+    h += `<div class="next"><h3>Up next</h3>${c.slice(1, 4).map(x => `<button class="nrow" data-act="edit" data-id="${x.id}">
+      <span class="t">${esc(x.title)}</span>${dots(path(x)[0].value)}</button>`).join('')}</div>`;
+  }
+  return h;
+}
+
+function viewGoals() {
+  let h = `<header class="top"><h1>Goals</h1><button class="btn small primary" data-act="newGoal">+ Add</button></header>`;
+  if (!S.goals.length) {
+    h += `<p class="hint">Nest goals: Area → Goal → Sub-goal → Task. Value 1–5. Priority is inherited: a 5 inside a 3-value area still ranks below anything in a 4-value area.</p>`;
+  }
+  const top = candidates()[0];
+  h += tree(null, 0, true, top && !S.timer ? top.id : null);
+  return h;
+}
+function tree(pid, d, parentActive, topId) {
+  return kids(pid).map(g => {
+    const ch = kids(g.id), open = !g.collapsed, act = parentActive && g.status === 'active';
+    const meta = [];
+    if (g.id === topId) meta.push('<span class="pill">NOW</span>');
+    if (g.status !== 'active') meta.push(g.status);
+    if (g.weeklyTargetMin > 0) meta.push(`${Math.round(weekMin(g.id))}/${g.weeklyTargetMin}m`);
+    if (ch.length && !open) meta.push(`${ch.length} inside`);
+    const cls = `node d${Math.min(d, 1)} ${g.status}${!parentActive ? ' inh' : ''}`;
+    return `<div class="${cls}" style="--d:${d}">
+      ${ch.length ? `<button class="chev ${open ? 'open' : ''}" data-act="toggle" data-id="${g.id}" aria-label="Expand or collapse">›</button>` : '<span class="chev-sp"></span>'}
+      <button class="nodebody" data-act="edit" data-id="${g.id}"><span class="t">${esc(g.title)}</span>
+        <span class="meta">${dots(g.value)}${meta.join(' · ')}</span></button>
+    </div>${ch.length && open ? tree(g.id, d + 1, act, topId) : ''}`;
+  }).join('');
+}
+
+function viewMore() {
+  const ws = +weekStart();
+  const wk = S.sessions.filter(s => s.start >= ws);
+  const mins = Math.round(wk.filter(s => s.status === 'done').reduce((t, s) => t + (s.end - s.start) / 60000, 0));
+  return `<header class="top"><h1>More</h1></header>
+  <section class="card">
+    <div class="stat"><span>Goals</span><span>${S.goals.length}</span></div>
+    <div class="stat"><span>This week</span><span>${mins} min · ${wk.filter(s => s.status === 'done').length} done · ${wk.filter(s => s.status === 'skipped').length} skipped</span></div>
+    <div class="stat"><span>Last backup</span><span>${ago(S.lastExport)}</span></div>
+    <div class="stat"><span>Storage</span><span>${!saveOk ? 'failing' : persisted === true ? 'persistent' : 'best-effort'}</span></div>
+  </section>
+  <section class="card">
+    <h2>Backup</h2>
+    <div class="row"><button class="btn primary" data-act="export">Export backup</button></div>
+    <div class="row"><button class="btn ghost" data-act="copyJson">Copy JSON</button>
+      <label class="btn ghost file" style="margin:0;color:var(--tx);font-size:16px">Import file<input type="file" accept="application/json,.json" id="importFile"></label></div>
+    <div class="row"><button class="btn ghost" data-act="pasteImport">Paste JSON to import</button></div>
+  </section>
+  ${notifSection()}
+  <section class="card">
+    <h2>Install</h2>
+    <p class="ctx">Safari → Share → Add to Home Screen. The home-screen app keeps its own data, separate from Safari — export from one, import into the other if you move.</p>
+  </section>
+  <div class="row"><button class="btn danger" data-act="reset">Erase all data</button></div>
+  <p class="ctx" style="text-align:center;margin-top:16px">YJGB v${APP_VERSION}</p>`;
+}
+
+// ---------- timer ----------
+let tickHandle = null;
+function tick() {
+  clearInterval(tickHandle);
+  if (!S.timer || !$('#clock')) return;
+  const upd = () => {
+    const el = now() - S.timer.start, plan = S.timer.plannedMin * 60000;
+    const c = $('#clock'); if (!c) return clearInterval(tickHandle);
+    c.textContent = fmtClock(el);
+    $('#tbar').style.width = Math.min(100, el / plan * 100) + '%';
+    $('#tbar').parentElement.classList.toggle('ok', el >= plan);
+    $('#tsub').textContent = el >= plan ? `Planned ${S.timer.plannedMin} min reached · +${fmtClock(el - plan)}` : `of ${S.timer.plannedMin} min`;
+  };
+  upd(); tickHandle = setInterval(upd, 1000);
+}
+function startGoal(id) {
+  const g = G(id); if (!g) return;
+  if (S.timer) { toast('A session is already running'); return; }
+  S.timer = { goalId: id, start: now(), plannedMin: g.sessionLengthMin || 30 };
+  save(); closeSheet(); tab = 'now'; render();
+}
+
+// ---------- sheets ----------
+let sheetCtx = null;
+function openSheet(html, ctx = null) {
+  sheetCtx = ctx;
+  $('#sheet').innerHTML = html; $('#sheet').scrollTop = 0;
+  $('#sheet').classList.add('on'); $('#backdrop').classList.add('on'); document.body.classList.add('locked');
+}
+function closeSheet() {
+  sheetCtx = null;
+  $('#sheet').classList.remove('on'); $('#backdrop').classList.remove('on'); document.body.classList.remove('locked');
+  if (document.activeElement) document.activeElement.blur();
+}
+function confirmSheet(title, body, okLabel, onOk, danger = true) {
+  openSheet(`<h2>${esc(title)}</h2><p class="ctx">${body}</p>
+    <div class="row"><button class="btn ${danger ? 'danger' : 'primary'}" data-act="confirmOk">${esc(okLabel)}</button>
+    <button class="btn ghost" data-act="closeSheet">Cancel</button></div>`, { onOk });
+}
+
+function flatOrdered(pid = null, out = []) { for (const g of kids(pid)) { out.push(g); flatOrdered(g.id, out); } return out; }
+
+function editGoal(id, parentId = null) {
+  const g = id ? G(id) : { parentId, title: '', value: parentId ? (G(parentId)?.value ?? 3) : 3, status: 'active', currentState: '', struggles: '', focus: '', targetDate: '', sessionLengthMin: 30, weeklyTargetMin: 0 };
+  if (!g) return;
+  const bad = id ? new Set(subtreeIds(id)) : new Set();
+  const opts = ['<option value="">— None (top-level area) —</option>']
+    .concat(flatOrdered().filter(x => !bad.has(x.id)).map(x =>
+      `<option value="${x.id}" ${x.id === g.parentId ? 'selected' : ''}>${'  '.repeat(path(x).length - 1).replace(/ /g, '&nbsp;')}${esc(x.title)}</option>`));
+  const segs = (name, vals, cur) => `<div class="seg" data-name="${name}">${vals.map(v => `<button type="button" data-v="${v}" class="${String(v) === String(cur) ? 'on' : ''}">${v}</button>`).join('')}</div>`;
+  openSheet(`<form id="gform" autocomplete="off">
+    <h2>${id ? 'Edit goal' : parentId ? 'New sub-goal' : 'New goal'}</h2>
+    <label>Title<input name="title" value="${esc(g.title)}" required placeholder="Become proficient in music theory" enterkeyhint="done"></label>
+    <label>Parent<select name="parentId">${opts.join('')}</select></label>
+    <div class="lbl">Value</div>${segs('value', [1,2,3,4,5], g.value)}
+    <div class="lbl">Status</div>${segs('status', ['active','paused','done'], g.status)}
+    <label>Focus / next action<textarea name="focus" rows="2" placeholder="The one concrete thing to do next session">${esc(g.focus)}</textarea></label>
+    <label>Where I am now<textarea name="currentState" rows="2">${esc(g.currentState)}</textarea></label>
+    <label>What I struggle with<textarea name="struggles" rows="2">${esc(g.struggles)}</textarea></label>
+    <div class="two">
+      <label>Weekly target (min)<input name="weeklyTargetMin" type="number" inputmode="numeric" min="0" step="15" value="${g.weeklyTargetMin || ''}" placeholder="none"></label>
+      <label>Session (min)<input name="sessionLengthMin" type="number" inputmode="numeric" min="5" step="5" value="${g.sessionLengthMin || 30}"></label>
+    </div>
+    <label>Target date<input name="targetDate" type="date" value="${esc(g.targetDate)}"></label>
+    <div class="row"><button class="btn primary" type="submit">Save</button><button class="btn ghost" type="button" data-act="closeSheet">Cancel</button></div>
+    ${id ? `<div class="row wrap">
+      <button type="button" class="btn ghost" data-act="addChild" data-id="${id}">+ Sub-goal</button>
+      <button type="button" class="btn ghost" data-act="startGoal" data-id="${id}" ${S.timer ? 'disabled' : ''}>Start now</button>
+      <button type="button" class="btn ghost" data-act="move" data-dir="-1" data-id="${id}">Move up</button>
+      <button type="button" class="btn ghost" data-act="move" data-dir="1" data-id="${id}">Move down</button>
+    </div>
+    <div class="row"><button type="button" class="btn danger" data-act="del" data-id="${id}">Delete</button></div>` : ''}
+  </form>`, { editId: id });
+  if (!id) setTimeout(() => { const t = $('#gform [name=title]'); t && t.focus(); }, 280);
+}
+function saveGoalForm(form) {
+  const fd = new FormData(form);
+  const segv = n => form.querySelector(`.seg[data-name=${n}] .on`)?.dataset.v;
+  const title = String(fd.get('title') || '').trim();
+  if (!title) { toast('Title required'); return; }
+  const id = sheetCtx?.editId;
+  const parentId = fd.get('parentId') || null;
+  if (id && parentId && subtreeIds(id).includes(parentId)) { toast("Can't nest a goal inside itself"); return; }
+  const data = {
+    title, parentId,
+    value: Number(segv('value') || 3),
+    status: segv('status') || 'active',
+    focus: String(fd.get('focus') || '').trim(),
+    currentState: String(fd.get('currentState') || '').trim(),
+    struggles: String(fd.get('struggles') || '').trim(),
+    weeklyTargetMin: Math.max(0, parseInt(fd.get('weeklyTargetMin'), 10) || 0),
+    sessionLengthMin: Math.max(5, parseInt(fd.get('sessionLengthMin'), 10) || 30),
+    targetDate: String(fd.get('targetDate') || ''),
+  };
+  const maxOrder = p => Math.max(0, ...S.goals.filter(x => (x.parentId || null) === p).map(x => x.order || 0));
+  if (id) {
+    const g = G(id);
+    if ((g.parentId || null) !== parentId) data.order = maxOrder(parentId) + 1;
+    Object.assign(g, data, { updated: now() });
+  } else {
+    S.goals.push(Object.assign({ id: uid(), created: now(), updated: now(), order: maxOrder(parentId) + 1, collapsed: false }, data));
+    if (parentId) { const p = G(parentId); if (p) p.collapsed = false; }
+  }
+  save(); closeSheet(); render(); toast(id ? 'Saved' : 'Added');
+}
+function moveGoal(id, dir) {
+  const g = G(id);
+  const sibs = kids(g.parentId).filter(x => x.value === g.value);
+  const i = sibs.findIndex(x => x.id === id), j = i + dir;
+  if (j < 0 || j >= sibs.length) { toast('Value sets order — Move only breaks ties between equal-value siblings'); return; }
+  sibs.forEach((x, k) => x.order = k);
+  [sibs[i].order, sibs[j].order] = [sibs[j].order, sibs[i].order];
+  save(); render(); toast(dir < 0 ? 'Moved up' : 'Moved down');
+}
+function deleteGoal(id) {
+  const ids = subtreeIds(id), g = G(id);
+  const n = ids.length - 1;
+  confirmSheet(`Delete “${g.title}”?`, `${n ? `This also deletes ${n} sub-goal${n > 1 ? 's' : ''}. ` : ''}Logged sessions stay in history.`, 'Delete', () => {
+    const set = new Set(ids);
+    S.goals = S.goals.filter(x => !set.has(x.id));
+    if (S.timer && set.has(S.timer.goalId)) S.timer = null;
+    save(); closeSheet(); render(); toast('Deleted');
+  });
+}
+function skipSheet(id) {
+  const g = G(id);
+  openSheet(`<h2>Skip “${esc(g.title)}” today?</h2><p class="ctx">The reason feeds your weekly check-in.</p>
+    <div class="chips">${['No time', 'Low energy', 'Blocked', 'Not today'].map(r => `<button data-act="skipReason" data-r="${r}">${r}</button>`).join('')}</div>
+    <label>Other reason<input id="skipOther" placeholder="Optional" enterkeyhint="done"></label>
+    <div class="row"><button class="btn primary" data-act="skipReason">Skip</button><button class="btn ghost" data-act="closeSheet">Cancel</button></div>`, { skipId: id });
+}
+function logSkip(reason) {
+  const g = G(sheetCtx.skipId), t = now();
+  S.sessions.push({ id: uid(), goalId: g.id, goalTitle: g.title, start: t, end: t, status: 'skipped', note: reason || '' });
+  save(); closeSheet(); render(); toast('Skipped for today');
+}
+function finishSheet() {
+  const el = now() - S.timer.start;
+  openSheet(`<h2>Log session</h2>
+    <label>Minutes<input id="finMin" type="number" inputmode="numeric" min="1" value="${Math.max(1, Math.round(el / 60000))}"></label>
+    <label>Note<textarea id="finNote" rows="3" placeholder="What did you do? What's next?"></textarea></label>
+    <label style="display:flex;align-items:center;gap:10px;color:var(--tx);font-weight:600"><input type="checkbox" id="finFocus" style="display:inline-block;flex:none;width:24px;min-height:24px;margin:0;-webkit-appearance:checkbox;appearance:auto">Use note as the next action</label>
+    <div class="row"><button class="btn primary" data-act="finishSave">Save</button><button class="btn ghost" data-act="closeSheet">Keep going</button></div>`);
+}
+function finishSave() {
+  const min = Math.max(1, parseInt($('#finMin').value, 10) || 1);
+  const note = $('#finNote').value.trim();
+  const g = G(S.timer.goalId);
+  S.sessions.push({ id: uid(), goalId: S.timer.goalId, goalTitle: g?.title || '', start: S.timer.start, end: S.timer.start + min * 60000, status: 'done', note });
+  if (g && note && $('#finFocus').checked) { g.focus = note; g.updated = now(); }
+  S.timer = null; save(); closeSheet(); render(); toast(`Logged ${min} min`);
+}
+
+// ---------- backup ----------
+async function exportData() {
+  const json = JSON.stringify(S, null, 1), name = `yjgb-backup-${isoDate()}.json`;
+  let file; try { file = new File([json], name, { type: 'application/json' }); } catch (e) {}
+  try {
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'YJGB backup' });
+      S.lastExport = now(); save(); render(); toast('Backup shared'); return;
+    }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  try {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' })); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    S.lastExport = now(); save(); render(); toast('Backup downloaded');
+  } catch (e) { toast('Download blocked — use Copy JSON'); }
+}
+async function copyJson() {
+  try { await navigator.clipboard.writeText(JSON.stringify(S)); S.lastExport = now(); save(); render(); toast('Copied — paste it into Notes or Files'); }
+  catch (e) { toast('Clipboard blocked'); }
+}
+function importText(txt) {
+  let d;
+  try { d = JSON.parse(txt); } catch (e) { toast('Not valid JSON'); return; }
+  if (!d || !Array.isArray(d.goals)) { toast("That doesn't look like a YJGB backup"); return; }
+  confirmSheet('Replace all data?', `Import ${d.goals.length} goals and ${(d.sessions || []).length} sessions. Current data is overwritten.`, 'Replace', () => {
+    S = migrate(d); save(); closeSheet(); tab = 'now'; render(); toast('Imported');
+  });
+}
+
+// ---------- notifications ----------
+// Pipeline: plan() derives upcoming notifications from state (idempotent keys, re-run on every save)
+// → deliverDue() hands due ones to the transport → present() shows banner (+ system notification when possible).
+// Transport is swappable: MockPush simulates a push server's responses; WebPush is the real path (needs a server).
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const hm = s => { const [h, m] = String(s || '0:0').split(':').map(Number); return (h || 0) * 60 + (m || 0); };
+function at(day, hhmm) { const x = dayStart(day); x.setMinutes(hm(hhmm)); return +x; }
+function inQuiet(ts) {
+  const q = S.notif.quiet, d = new Date(ts), m = d.getHours() * 60 + d.getMinutes(), a = hm(q.start), b = hm(q.end);
+  return a === b ? false : a < b ? (m >= a && m < b) : (m >= a || m < b);
+}
+function quietEnd(ts) { let t = at(new Date(ts), S.notif.quiet.end); if (t <= ts) t = at(new Date(ts + 86400000), S.notif.quiet.end); return t; }
+const fmtWhen = ts => {
+  const d = new Date(ts), tm = d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  return +dayStart(d) === +dayStart() ? `Today ${tm}` : `${d.toLocaleDateString(undefined, { weekday: 'short' })} ${tm}`;
+};
+
+const MockPush = {
+  name: 'mock',
+  async subscribe() { await sleep(400); return { endpoint: `mock://push.yjgb.local/${uid()}`, keys: { p256dh: 'mock', auth: 'mock' }, createdAt: now() }; },
+  async unsubscribe() { await sleep(150); return { ok: true }; },
+  async send(sub, payload) {
+    await sleep(250 + Math.random() * 500);
+    if (!sub) return { ok: false, status: 410, error: 'Subscription gone' };
+    if (S.notif.simulateFailure && Math.random() < 0.4) return { ok: false, status: 503, error: 'Push service unavailable' };
+    return { ok: true, status: 201, messageId: 'mock-' + uid() };
+  },
+};
+const WebPush = { // Real path. Needs: VAPID public key + a server that stores the subscription and sends at fireAt.
+  name: 'webpush',
+  async subscribe() {
+    const reg = await navigator.serviceWorker.ready;
+    const VAPID_PUBLIC_KEY = null; // TODO
+    if (!VAPID_PUBLIC_KEY) throw new Error('No push server configured');
+    return (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: VAPID_PUBLIC_KEY })).toJSON();
+  },
+  async unsubscribe() { const reg = await navigator.serviceWorker.ready; const s = await reg.pushManager.getSubscription(); if (s) await s.unsubscribe(); return { ok: true }; },
+  async send() { return { ok: false, status: 501, error: 'Server-side send not implemented' }; }, // server sends, not the page
+};
+const transport = () => (S.notif.transport === 'webpush' ? WebPush : MockPush);
+
+function plan() {
+  planning = true;
+  try {
+    const N = S.notif, t = now();
+    // Rebuild pending items from current state. A pending item that's already due keeps its slot so deliverDue
+    // can send it (or mark it missed); pending items whose condition no longer holds simply aren't regenerated.
+    const prev = new Map(S.notifications.filter(n => n.status === 'scheduled' && n.kind !== 'test').map(n => [n.key, n]));
+    S.notifications = S.notifications.filter(n => !(n.status === 'scheduled' && n.kind !== 'test'));
+    const taken = new Set(S.notifications.map(n => n.key));
+    const add = (key, fireAt, payload, o = {}) => {
+      if (taken.has(key)) return;
+      if (!o.ignoreQuiet && inQuiet(fireAt)) { if (o.dropInQuiet) return; fireAt = quietEnd(fireAt); }
+      const old = prev.get(key);
+      if (old) { S.notifications.push(Object.assign(old, { fireAt, payload })); return; }
+      if (fireAt <= t) return;
+      S.notifications.push({ id: uid(), key, kind: key.split(':')[0], fireAt, status: 'scheduled', payload, attempts: 0, created: t });
+    };
+    if (N.enabled) {
+      if (N.prefs.sessionEnd && S.timer) {
+        const g = G(S.timer.goalId);
+        add(`session:${S.timer.start}`, S.timer.start + S.timer.plannedMin * 60000,
+          { title: `${S.timer.plannedMin} min done`, body: `${g ? g.title : 'Session'} — log it or keep going.`, data: { action: 'finish' } }, { ignoreQuiet: true });
+      }
+      const doneToday = S.sessions.some(x => x.status === 'done' && x.start >= +dayStart());
+      for (const off of [0, 1]) { // plan today + tomorrow so a real server would have tomorrow's kickoff before midnight
+        const day = new Date(+dayStart() + off * 86400000 + 2 * 3600000), ds = isoDate(day);
+        const c = candidates(off > 0)[0];
+        if (N.prefs.kickoff && c) add(`kickoff:${ds}`, at(day, N.prefs.kickoffTime),
+          { title: 'YJGB', body: `Up first: ${c.title}${c.focus ? ' — ' + c.focus : ''}`, data: { action: 'open', goalId: c.id } });
+        if (N.prefs.idle && c && (off > 0 || !doneToday)) add(`idle:${ds}`, at(day, N.prefs.idleTime),
+          { title: 'Nothing logged today', body: `${c.sessionLengthMin || 30} min on ${c.title}?`, data: { action: 'open', goalId: c.id } }, { dropInQuiet: true });
+        const backupDue = S.goals.length && (!S.lastExport || at(day, '12:00') - S.lastExport > 7 * 86400000);
+        if (N.prefs.backup && backupDue) add(`backup:${ds}`, at(day, '12:00'),
+          { title: 'Back up YJGB', body: `Last backup ${ago(S.lastExport)}. iOS can clear web-app data.`, data: { action: 'backup' } });
+      }
+    }
+    const hist = S.notifications.filter(n => n.status !== 'scheduled').sort((a, b) => b.fireAt - a.fireAt);
+    if (hist.length > 100) { const drop = new Set(hist.slice(100).map(n => n.id)); S.notifications = S.notifications.filter(n => !drop.has(n.id)); }
+    persist();
+  } finally { planning = false; }
+}
+
+let delivering = false;
+async function deliverDue() {
+  if (delivering || !S.notif.enabled) return;
+  delivering = true;
+  let changed = false;
+  try {
+    const t = now();
+    const due = S.notifications.filter(n => (n.status === 'scheduled' || (n.status === 'failed' && n.attempts < 3)) && (n.retryAt || n.fireAt) <= t)
+      .sort((a, b) => a.fireAt - b.fireAt);
+    for (const n of due) {
+      changed = true;
+      if (n.kind !== 'test' && t - n.fireAt > 30 * 60000) { // app was closed at fire time; mock can't deliver in background
+        n.status = 'missed'; n.deliveredAt = t; continue;
+      }
+      n.attempts++;
+      const res = await transport().send(S.notif.subscription, n.payload);
+      n.response = res;
+      if (res.ok) { n.status = 'delivered'; n.deliveredAt = now(); present(n); }
+      else { n.status = 'failed'; n.error = res.error; n.retryAt = now() + 30000 * n.attempts; }
+    }
+    if (changed) persist();
+  } finally { delivering = false; }
+  if (changed) { updateBadge(); if (tab === 'more' && !$('#sheet').classList.contains('on')) render(); }
+}
+
+let bannerT;
+function present(n) {
+  const b = $('#nbanner');
+  b.dataset.nid = n.id;
+  b.innerHTML = `<img src="icon-180.png" alt=""><span style="flex:1;min-width:0"><span class="nt">${esc(n.payload.title)}</span><span class="nb">${esc(n.payload.body)}</span></span><span class="na">now</span>`;
+  b.classList.add('on'); clearTimeout(bannerT); bannerT = setTimeout(hideBanner, 7000);
+  try { // system notification when backgrounded and permitted (desktop/Android; iOS only with real push)
+    if (document.hidden && 'Notification' in window && Notification.permission === 'granted' && navigator.serviceWorker) {
+      navigator.serviceWorker.ready.then(r => r.showNotification(n.payload.title, { body: n.payload.body, tag: n.key, icon: 'icon-192.png', data: Object.assign({ nid: n.id }, n.payload.data) })).catch(() => {});
+    }
+  } catch (e) {}
+}
+function hideBanner() { $('#nbanner').classList.remove('on'); }
+const isUnread = n => (n.status === 'delivered' || n.status === 'missed') && !n.seen;
+const unreadCount = () => S.notifications.filter(isUnread).length;
+function updateBadge() { const b = document.querySelector('.bell .badge'); if (b) b.textContent = unreadCount() || ''; }
+
+function runAction(data = {}, nid) {
+  const n = nid && S.notifications.find(x => x.id === nid);
+  if (n) { n.seen = true; n.openedAt = now(); if (n.status === 'delivered' || n.status === 'missed') n.status = 'opened'; persist(); }
+  hideBanner(); closeSheet();
+  tab = data.action === 'backup' ? 'more' : 'now';
+  render();
+  if (data.action === 'finish' && S.timer) setTimeout(finishSheet, 50);
+}
+function inboxSheet() {
+  const hist = S.notifications.filter(n => n.status !== 'scheduled').sort((a, b) => (b.deliveredAt || b.fireAt) - (a.deliveredAt || a.fireAt));
+  const up = S.notifications.filter(n => n.status === 'scheduled').sort((a, b) => a.fireAt - b.fireAt);
+  const unread = new Set(hist.filter(isUnread).map(n => n.id));
+  hist.forEach(n => { n.seen = true; }); persist();
+  const label = n => n.status === 'missed' ? 'missed · app closed' : n.status === 'failed' ? `failed · ${esc(n.error)}${n.attempts < 3 ? ' · retrying' : ''}` : n.status;
+  openSheet(`<h2>Inbox</h2>
+    ${hist.length ? hist.map(n => `<button class="ni ${unread.has(n.id) ? 'unread' : ''}" data-act="nAction" data-nid="${n.id}">
+      <span class="nt">${esc(n.payload.title)}</span><span class="nb">${esc(n.payload.body)}</span>
+      <span class="nm">${fmtWhen(n.deliveredAt || n.fireAt)} · <span class="st ${n.status}">${label(n)}</span>${n.response ? ` · ${n.response.status}` : ''}</span></button>`).join('') : '<p class="ctx">Nothing delivered yet.</p>'}
+    ${up.length ? `<div class="next"><h3>Scheduled</h3>${up.map(n => `<div class="ni sched"><span class="nt">${esc(n.payload.title)}</span><span class="nb">${esc(n.payload.body)}</span><span class="nm">${fmtWhen(n.fireAt)}</span></div>`).join('')}</div>` : ''}
+    <div class="row"><button class="btn ghost" data-act="closeSheet">Close</button></div>`);
+  updateBadge();
+}
+function notifSection() {
+  const N = S.notif;
+  if (!N.enabled) return `<section class="card"><h2>Notifications</h2>
+    <p class="ctx">Session time-up, morning kickoff, evening nudge if nothing's logged, backup reminders. Mock push for now: delivers while the app is open; anything due while it's closed shows as missed.</p>
+    <div class="row"><button class="btn primary" data-act="enableNotif">Enable notifications</button></div></section>`;
+  const sw = (k, label, extra = '') => `<div class="sw"><span>${label}</span><span class="swr">${extra}<label class="swl"><input type="checkbox" data-pref="${k}" ${N.prefs[k] ? 'checked' : ''} aria-label="${label}"></label></span></div>`;
+  const sys = 'Notification' in window ? Notification.permission : 'unavailable';
+  return `<section class="card"><h2>Notifications</h2>
+    <div class="stat"><span>Transport</span><span>${N.transport === 'mock' ? 'Mock push' : 'Web Push'} · …${esc((N.subscription?.endpoint || 'none').slice(-8))}</span></div>
+    <div class="stat"><span>System permission</span><span>${esc(sys)}</span></div>
+    ${sw('sessionEnd', 'Session time-up')}
+    ${sw('kickoff', 'Morning kickoff', `<input class="tm" type="time" data-time="kickoffTime" value="${N.prefs.kickoffTime}">`)}
+    ${sw('idle', 'Nudge if nothing logged', `<input class="tm" type="time" data-time="idleTime" value="${N.prefs.idleTime}">`)}
+    ${sw('backup', 'Backup reminders')}
+    <div class="sw"><span>Quiet hours</span><span class="swr"><input class="tm" type="time" data-quiet="start" value="${N.quiet.start}">–<input class="tm" type="time" data-quiet="end" value="${N.quiet.end}"></span></div>
+    <div class="sw"><span>Simulate push failures</span><span class="swr"><label class="swl"><input type="checkbox" data-flag="simulateFailure" ${N.simulateFailure ? 'checked' : ''} aria-label="Simulate push failures"></label></span></div>
+    <div class="row"><button class="btn ghost" data-act="testNotif">Send test</button><button class="btn ghost" data-act="inbox">Inbox</button></div>
+    <div class="row"><button class="btn ghost" data-act="disableNotif">Turn off</button></div>
+  </section>`;
+}
+async function enableNotifs() {
+  let perm = 'unavailable';
+  try { if ('Notification' in window && Notification.requestPermission) perm = await Notification.requestPermission(); } catch (e) {}
+  try {
+    S.notif.subscription = await transport().subscribe();
+  } catch (e) { toast('Subscribe failed: ' + e.message); return; }
+  S.notif.enabled = true; S.notif.permission = perm;
+  save(); render(); toast('Notifications on (mock push)');
+}
+async function disableNotifs() {
+  try { await transport().unsubscribe(); } catch (e) {}
+  S.notif.enabled = false; S.notif.subscription = null;
+  save(); render(); toast('Notifications off');
+}
+function testNotif() {
+  S.notifications.push({ id: uid(), key: `test:${uid()}`, kind: 'test', fireAt: now(), status: 'scheduled', attempts: 0, created: now(),
+    payload: { title: 'Test notification', body: 'Mock push round-trip OK. Tap to open.', data: { action: 'open' } } });
+  persist(); deliverDue();
+}
+
+// ---------- events ----------
+let toastT;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2200); }
+
+document.addEventListener('click', e => {
+  const segBtn = e.target.closest('.seg button');
+  if (segBtn) { segBtn.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === segBtn)); return; }
+  const tb = e.target.closest('.tabbar button');
+  if (tb) { tab = tb.dataset.tab; render(); window.scrollTo(0, 0); return; }
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const act = el.dataset.act, id = el.dataset.id;
+  if (el.tagName === 'A') e.preventDefault();
+  switch (act) {
+    case 'tab': tab = el.dataset.tab; render(); break;
+    case 'newGoal': editGoal(null); break;
+    case 'edit': editGoal(id); break;
+    case 'addChild': editGoal(null, id); break;
+    case 'toggle': { const g = G(id); g.collapsed = !g.collapsed; save(); render(); break; }
+    case 'move': moveGoal(id, Number(el.dataset.dir)); break;
+    case 'del': deleteGoal(id); break;
+    case 'start': case 'startGoal': startGoal(id); break;
+    case 'skip': skipSheet(id); break;
+    case 'skipReason': logSkip(el.dataset.r || ($('#skipOther')?.value.trim() || '')); break;
+    case 'unskip': { const t0 = +dayStart(); S.sessions = S.sessions.filter(s => !(s.status === 'skipped' && s.start >= t0)); save(); render(); break; }
+    case 'finish': finishSheet(); break;
+    case 'finishSave': finishSave(); break;
+    case 'cancelTimer': confirmSheet('Cancel session?', 'Nothing will be logged.', 'Cancel session', () => { S.timer = null; save(); closeSheet(); render(); }); break;
+    case 'closeSheet': closeSheet(); break;
+    case 'confirmOk': sheetCtx?.onOk?.(); break;
+    case 'export': exportData(); break;
+    case 'copyJson': copyJson(); break;
+    case 'pasteImport': openSheet(`<h2>Import from JSON</h2><label>Paste backup<textarea id="pasteBox" rows="8"></textarea></label>
+      <div class="row"><button class="btn primary" data-act="pasteGo">Import</button><button class="btn ghost" data-act="closeSheet">Cancel</button></div>`); break;
+    case 'pasteGo': importText($('#pasteBox').value); break;
+    case 'inbox': inboxSheet(); break;
+    case 'nAction': { const n = S.notifications.find(x => x.id === el.dataset.nid); if (n) runAction(n.payload.data, n.id); break; }
+    case 'enableNotif': enableNotifs(); break;
+    case 'disableNotif': disableNotifs(); break;
+    case 'testNotif': testNotif(); break;
+    case 'reset': confirmSheet('Erase everything?', 'All goals and history are deleted from this device. Export first if unsure.', 'Erase', () => { S = blank(); save(); closeSheet(); tab = 'now'; render(); }); break;
+  }
+});
+document.addEventListener('submit', e => { if (e.target.id === 'gform') { e.preventDefault(); saveGoalForm(e.target); } });
+document.addEventListener('change', e => {
+  const ds = e.target.dataset || {};
+  if (ds.pref) { S.notif.prefs[ds.pref] = e.target.checked; save(); return; }
+  if (ds.time && e.target.value) { S.notif.prefs[ds.time] = e.target.value; save(); return; }
+  if (ds.quiet && e.target.value) { S.notif.quiet[ds.quiet] = e.target.value; save(); return; }
+  if (ds.flag) { S.notif[ds.flag] = e.target.checked; save(); return; }
+  if (e.target.id === 'importFile' && e.target.files[0]) {
+    const r = new FileReader(); r.onload = () => importText(String(r.result)); r.readAsText(e.target.files[0]); e.target.value = '';
+  }
+});
+$('#backdrop').addEventListener('click', closeSheet);
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) return;
+  plan(); deliverDue();
+  if (!$('#sheet').classList.contains('on')) render();
+});
+
+// ---------- offline ----------
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  try { navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (e) {}
+}
+if ('serviceWorker' in navigator) {
+  try { navigator.serviceWorker.addEventListener('message', ev => { if (ev.data && ev.data.type === 'notificationclick') runAction(ev.data.data, ev.data.data.nid); }); } catch (e) {}
+}
+plan();
+render();
+if (location.hash.startsWith('#n-')) { const a = location.hash.slice(3); history.replaceState(null, '', location.pathname); runAction({ action: a }); }
+deliverDue();
+setInterval(deliverDue, 10000);
+setInterval(plan, 5 * 60000);
+})();
+</script>
+</body>
+</html>
