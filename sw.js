@@ -1,5 +1,5 @@
 // YJGB service worker: network-first for the app page (so updates land), cache-first for static assets.
-const CACHE = 'yjgb-v0.4.3';
+const CACHE = 'yjgb-v0.4.4';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './fonts/anton.woff2', './img/splash.png', './fonts/montserrat-900-italic.woff2'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS))); self.skipWaiting(); });
 self.addEventListener('activate', e => {
