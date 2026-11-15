@@ -28,7 +28,7 @@ button,input,select,textarea{font-family:inherit;font-size:16px;color:inherit}
 .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:16px 2px 12px;margin-bottom:16px;border-bottom:4px solid var(--ink)}
 h1.brand{font-family:Futura,"Montserrat",sans-serif;font-weight:900;font-style:italic;color:var(--acc);font-size:56px;line-height:.85;letter-spacing:-.01em;text-transform:uppercase;-webkit-text-stroke:1px var(--acc);paint-order:stroke fill;white-space:nowrap}
 h1.brand .bj{display:inline-block;transform:scaleX(1.15);margin:0 .045em}
-html.futura h1.brand{font-weight:700;-webkit-text-stroke:3.5px var(--acc);letter-spacing:.01em}
+html.futura h1.brand{font-weight:700;-webkit-text-stroke:4.5px var(--acc);letter-spacing:.02em}
 html.futura h1.brand .bj{transform:none;margin:0}
 #splash{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .35s ease}
 #splash img{width:min(60vw,300px);height:auto;animation:splashIn .5s cubic-bezier(.2,.8,.2,1) both,splashPulse 1.6s ease-in-out .5s infinite}
@@ -163,7 +163,7 @@ try {
   if (Math.abs(c.measureText(t).width - base) > 1) document.documentElement.classList.add('futura');
 } catch (e) {}
 const KEY = 'doit.v1';
-const APP_VERSION = '0.4.4';
+const APP_VERSION = '0.4.5';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
