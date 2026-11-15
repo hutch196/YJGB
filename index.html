@@ -15,7 +15,7 @@
 <link rel="icon" href="icon-192.png">
 <title>YJGB</title>
 <style>
-@font-face{font-family:"Jost";src:url("fonts/jost-900-italic.woff2") format("woff2");font-weight:900;font-style:italic;font-display:swap}
+@font-face{font-family:"Montserrat";src:url("fonts/montserrat-900-italic.woff2") format("woff2");font-weight:900;font-style:italic;font-display:swap}
 @font-face{font-family:"Anton";src:url("fonts/anton.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
 :root{--bg:#efebe2;--card:#fbf9f4;--card2:#e2ddd1;--ink:#111;--line:#cfc8ba;--tx:#111;--mut:#5f5a51;--acc:#e33425;--ok:#1f7a4a;--disp:"Anton",Impact,"Arial Narrow Bold",sans-serif;color-scheme:light}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -26,7 +26,8 @@ body.locked{overflow:hidden}
 main{padding:8px 16px calc(104px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto}
 button,input,select,textarea{font-family:inherit;font-size:16px;color:inherit}
 .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:16px 2px 12px;margin-bottom:16px;border-bottom:4px solid var(--ink)}
-h1.brand{font-family:"Jost",Futura,sans-serif;font-weight:900;font-style:italic;color:var(--acc);font-size:58px;line-height:.85;letter-spacing:-.02em;text-transform:uppercase;-webkit-text-stroke:1.5px var(--acc);paint-order:stroke fill}
+h1.brand{font-family:"Montserrat",Futura,sans-serif;font-weight:900;font-style:italic;color:var(--acc);font-size:56px;line-height:.85;letter-spacing:-.01em;text-transform:uppercase;-webkit-text-stroke:1px var(--acc);paint-order:stroke fill;white-space:nowrap}
+h1.brand .bj{display:inline-block;transform:scaleX(1.15);margin:0 .045em}
 #splash{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .35s ease}
 #splash img{width:min(60vw,300px);height:auto;animation:splashIn .5s cubic-bezier(.2,.8,.2,1) both,splashPulse 1.6s ease-in-out .5s infinite}
 #splash.out{opacity:0;transform:scale(1.06);pointer-events:none;transition:opacity .45s ease,transform .45s cubic-bezier(.4,0,.2,1)}
@@ -153,7 +154,7 @@ input:focus,select:focus,textarea:focus{outline:3px solid var(--acc);outline-off
 (() => {
 'use strict';
 const KEY = 'doit.v1';
-const APP_VERSION = '0.4.1';
+const APP_VERSION = '0.4.2';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
@@ -278,7 +279,7 @@ function backupNudge() {
 
 function viewNow() {
   const bell = S.notif.enabled || S.notifications.length ? `<button class="bell" data-act="inbox" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="badge">${unreadCount() || ''}</span></button>` : '';
-  let h = `<header class="top"><h1 class="brand">YJGB</h1><div class="hdr-r"><div class="date">${fmtDate(new Date())}</div>${bell}</div></header>`;
+  let h = `<header class="top"><h1 class="brand" aria-label="YJGB">Y<span class="bj">J</span>GB</h1><div class="hdr-r"><div class="date">${fmtDate(new Date())}</div>${bell}</div></header>`;
   if (S.timer) {
     const g = G(S.timer.goalId);
     if (g) {
