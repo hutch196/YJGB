@@ -24,6 +24,7 @@ body.locked{overflow:hidden}
 main{padding:8px 16px calc(104px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto}
 button,input,select,textarea{font-family:inherit;font-size:16px;color:inherit}
 .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:16px 2px 12px;margin-bottom:16px;border-bottom:4px solid var(--ink)}
+h1.logo{line-height:0}h1.logo img{height:68px;width:auto;display:block}
 h1{font-family:var(--disp);font-weight:400;font-size:52px;line-height:.9;margin:0;text-transform:uppercase;letter-spacing:.01em}
 h2{font-family:var(--disp);font-weight:400;margin:0 0 8px;font-size:28px;line-height:1.05;text-transform:uppercase;letter-spacing:.01em}
 .date{color:var(--mut);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;text-align:right}
@@ -143,7 +144,7 @@ input:focus,select:focus,textarea:focus{outline:3px solid var(--acc);outline-off
 (() => {
 'use strict';
 const KEY = 'doit.v1';
-const APP_VERSION = '0.3.0';
+const APP_VERSION = '0.3.1';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
@@ -268,7 +269,7 @@ function backupNudge() {
 
 function viewNow() {
   const bell = S.notif.enabled || S.notifications.length ? `<button class="bell" data-act="inbox" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="badge">${unreadCount() || ''}</span></button>` : '';
-  let h = `<header class="top"><h1>YJGB</h1><div class="hdr-r"><div class="date">${fmtDate(new Date())}</div>${bell}</div></header>`;
+  let h = `<header class="top"><h1 class="logo"><img src="img/logo.png" alt="YJGB" width="45" height="68"></h1><div class="hdr-r"><div class="date">${fmtDate(new Date())}</div>${bell}</div></header>`;
   if (S.timer) {
     const g = G(S.timer.goalId);
     if (g) {
